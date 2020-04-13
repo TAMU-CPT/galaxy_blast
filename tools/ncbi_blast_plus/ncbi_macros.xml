@@ -7,7 +7,9 @@
 
     <xml name="preamble">
         <requirements>
-            <requirement type="package" version="2.7.1">blast</requirement>
+            <requirement type="binary">@BINARY@</requirement>
+            <requirement type="package" version="2.9.0">blast+</requirement>
+            <requirement type="package" version="0.5.0">taxonkit</requirement>
         </requirements>
         <version_command>@BINARY@ -version</version_command>
     </xml>
@@ -29,6 +31,7 @@
             <when input="output.out_format" value="4" format="txt"/>
             <when input="output.out_format" value="4 -html" format="html"/>
             <when input="output.out_format" value="5" format="blastxml"/>
+            <when input="output.out_format" value="16" format="blastxml"/>
         </change_format>
     </xml>
 
@@ -39,6 +42,7 @@
                 <option value="ext" selected="true">Tabular (extended 25 columns)</option>
                 <option value="cols">Tabular (select which columns)</option>
                 <option value="5">BLAST XML</option>
+                <option value="16">BLAST XML2</option>
                 <option value="0">Pairwise text</option>
                 <option value="0 -html">Pairwise HTML</option>
                 <option value="2">Query-anchored text</option>
@@ -111,6 +115,7 @@
                 </param>
             </when>
             <when value="5"/>
+            <when value="16"/>
             <when value="0"/>
             <when value="0 -html"/>
             <when value="2"/>
@@ -352,7 +357,7 @@
             </param>
             <when value="db">
                 <param name="database" type="select" multiple="true" label="Nucleotide BLAST database">
-                    <options from_data_table="blastdb" />
+                    <options from_data_table="blastdb_new" />
                 </param>
                 <param name="histdb" type="hidden" value="" />
                 <param name="subject" type="hidden" value="" />
@@ -380,7 +385,7 @@
             </param>
             <when value="db">
                 <param name="database" type="select" multiple="true" label="Protein BLAST database">
-                    <options from_data_table="blastdb_p" />
+                    <options from_data_table="blastdb_p_new" />
                 </param>
                 <param name="histdb" type="hidden" value="" />
                 <param name="subject" type="hidden" value="" />
@@ -457,6 +462,10 @@
 
     <xml name="input_evalue">
         <param name="evalue_cutoff" argument="-evalue" type="float" size="15" value="0.001" label="Set expectation value cutoff" />
+    </xml>
+
+    <xml name="input_taxIDs">
+        <param label="Filter by TaxIDs (Can be multiple, separated by space. Will automatically include sub-IDs)" name="taxids" type="text" value="" optional="true"/>
     </xml>
 
     <xml name="input_word_size">
@@ -571,6 +580,21 @@
   -query <(gunzip -c '${query}')
 #else:
   -query '${query}'
+#end if
+    ]]></token>
+
+    <token name="@TAXONKIT@"><![CDATA[
+#if $taxids != "":
+  for i in $taxids;
+    do taxonkit --data-dir $__tool_data_path__  list --ids \$i | sed 's/ //g' >> taxFile.txt;
+    truncate -s-1 taxFile.txt;
+  done;
+#end if
+    ]]></token>
+
+    <token name="@TAXID_FILTER@"><![CDATA[
+#if $taxids != "":
+ -taxidlist taxFile.txt
 #end if
     ]]></token>
 
@@ -717,8 +741,10 @@ Tool Shed at http://toolshed.g2.bx.psu.edu/view/devteam/ncbi_blast_plus
             <citation type="doi">10.1093/nar/25.17.3389</citation>
             <citation type="doi">10.1186/1471-2105-10-421</citation>
             <citation type="doi">10.1186/s13742-015-0080-7</citation>
+            <yield/>
         </citations>
     </xml>
+
     <token name="@OUTPUT_FORMAT@"><![CDATA[
 **Output format**
 
@@ -728,8 +754,8 @@ tool is tabular. The standard BLAST+ tabular output contains 12 columns:
 ====== ========= ============================================
 Column NCBI name Description
 ------ --------- --------------------------------------------
-     1 qaccver   Query accession dot version
-     2 saccver   Subject accession dot version (database hit)
+     1 qseqid    Query Seq-id (ID of your sequence)
+     2 sseqid    Subject Seq-id (ID of the database hit)
      3 pident    Percentage of identical matches
      4 length    Alignment length
      5 mismatch  Number of mismatches
@@ -741,12 +767,6 @@ Column NCBI name Description
     11 evalue    Expectation value (E-value)
     12 bitscore  Bit score
 ====== ========= ============================================
-
-Until BLAST+ 2.5.0, the first two columns were ``qseqid`` and ``sseqid``,
-which were usually strings contained multiple pipe-separated entries.
-In BLAST+ 2.5.0, the first two columns became ``qacc`` and ``sacc``
-(accesion only), while in BLAST+ 2.6.0 this was changed again to use
-``qaccver`` and ``saccver`` (accession dot version).
 
 The BLAST+ tools can optionally output additional columns of information,
 but this takes longer to calculate. Many commonly used extra columns are
@@ -818,3 +838,4 @@ appendices.
 
     ]]></token>
 </macros>
+

@@ -1,4 +1,4 @@
-<tool id="ncbi_blastp_wrapper" name="NCBI BLAST+ blastp" version="@WRAPPER_VERSION@">
+<tool id="ncbi_blastp_wrapper_other" name="NCBI BLAST+ blastp (Publish Test)" version="@WRAPPER_VERSION@">
     <description>Search protein database with protein query sequence(s)</description>
     <macros>
         <token name="@BINARY@">blastp</token>
@@ -9,11 +9,13 @@
     <command detect_errors="aggressive">
 ## The command is a Cheetah template which allows some Python based syntax.
 ## Lines starting hash hash are comments. Galaxy will turn newlines into spaces
+@TAXONKIT@
 blastp
 @QUERY@
 @BLAST_DB_SUBJECT@
 -task $blast_type
 -evalue $evalue_cutoff
+@TAXID_FILTER@
 @BLAST_OUTPUT@
 @THREADS@
 #if $adv_opts.adv_opts_selector=="advanced":
@@ -46,6 +48,7 @@ blastp
         </param>
         <expand macro="input_evalue" />
         <expand macro="input_out_format" />
+        <expand macro="input_taxIDs" />
         <expand macro="advanced_options">
             <!-- Could use a select (yes, no, other) where other allows setting 'window locut hicut' -->
             <expand macro="input_filter_query_default_false" />
@@ -192,5 +195,8 @@ cite the following papers:
 
 @REFERENCES@
     </help>
-    <expand macro="blast_citations" />
+    <expand macro="blast_citations" >
+        <citation type="doi">10.1101/513523</citation>
+    </expand>
 </tool>
+
