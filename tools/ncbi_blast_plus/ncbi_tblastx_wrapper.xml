@@ -36,9 +36,9 @@ tblastx
 
         <expand macro="input_conditional_nucleotide_db" />
         <expand macro="input_query_gencode" />
-        <expand macro="input_evalue" />
-        <expand macro="input_taxIDs" /> 
+        <expand macro="input_evalue" /> 
         <expand macro="input_out_format" />
+        <expand macro="input_taxIDs" />
 
         <expand macro="advanced_options">
             <expand macro="input_db_gencode" />

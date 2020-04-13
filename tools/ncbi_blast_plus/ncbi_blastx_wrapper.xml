@@ -44,8 +44,8 @@ $adv_opts.ungapped
             <option value="blastx-fast">blastx-fast - Use longer words for seeding, faster but less accurate</option>
         </param>
         <expand macro="input_evalue" />
-        <expand macro="input_taxIDs" /> 
         <expand macro="input_out_format" />
+        <expand macro="input_taxIDs" /> 
 
         <expand macro="advanced_options">
             <!-- Could use a select (yes, no, other) where other allows setting 'window locut hicut' -->

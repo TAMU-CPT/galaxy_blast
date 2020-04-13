@@ -43,9 +43,9 @@ tblastn
             <option value="tblastn-fast">tblastn-fast - Use longer words for seeding, faster but less accurate</option>
         </param>
         <expand macro="input_evalue" />
-        <expand macro="input_taxIDs" />
         <expand macro="input_out_format" />
-        
+        <expand macro="input_taxIDs" />
+
         <expand macro="advanced_options">
             <expand macro="input_db_gencode" />
 
